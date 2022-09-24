@@ -1,0 +1,391 @@
+{
+	"info": {
+		"_postman_id": "73095eca-e19a-4746-b477-4e841ee97c30",
+		"name": "RSCourse_ECommerce",
+		"description": "Application URL - [https://rahulshettyacademy.com/client](https://rahulshettyacademy.com/client/auth/login)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15101547"
+	},
+	"item": [
+		{
+			"name": "AccountLogin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Application Login\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"Login Successfully\");\r",
+							"})\r",
+							"\r",
+							"pm.environment.set(\"AccountLogin_RsB_Auth\", APIResponseBody.token);\r",
+							"pm.environment.set(\"AccountLogin_RsB_UserID\", APIResponseBody.userId);\r",
+							"    "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userEmail\": \"{{LoginCred_Username}}\",\r\n    \"userPassword\": \"{{LoginCred_Password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURI}}{{Login_Resource}}",
+					"host": [
+						"{{BaseURI}}{{Login_Resource}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddProduct",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Add New Product\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"Product Added Successfully\");\r",
+							"})\r",
+							"\r",
+							"pm.environment.set(\"AddProduct_RsB_ProductID\", APIResponseBody.productId);\r",
+							"    "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "productName",
+							"value": "{{AddProduct_RqB_Name}}",
+							"type": "text"
+						},
+						{
+							"key": "productAddedBy",
+							"value": "{{AccountLogin_RsB_UserID}}",
+							"type": "text"
+						},
+						{
+							"key": "productCategory",
+							"value": "fashion",
+							"type": "text"
+						},
+						{
+							"key": "productSubCategory",
+							"value": "shirts",
+							"type": "text"
+						},
+						{
+							"key": "productPrice",
+							"value": "{{AddProduct_RqB_Price}}",
+							"type": "text"
+						},
+						{
+							"key": "productDescription",
+							"value": "{{AddProduct_RqB_Name}}",
+							"type": "text"
+						},
+						{
+							"key": "productFor",
+							"value": "men",
+							"type": "text"
+						},
+						{
+							"key": "productImage",
+							"type": "file",
+							"src": "ZmsT1va4z/image.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BaseURI}}{{AddProduct_Resource}}",
+					"host": [
+						"{{BaseURI}}{{AddProduct_Resource}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddToCart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Add Product To Cart\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"Product Added To Cart\");\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"_id\": \"{{AccountLogin_RsB_UserID}}\",\r\n    \"product\": {\r\n        \"_id\": \"{{AddProduct_RsB_ProductID}}\",\r\n        \"productName\": \"{{AddProduct_RqB_Name}}\",\r\n        \"productCategory\": \"fashion\",\r\n        \"productSubCategory\": \"shirts\",\r\n        \"productPrice\": {{AddProduct_RqB_Price}},\r\n        \"productDescription\": \"{{AddProduct_RqB_Name}}\",\r\n        \"productImage\": \"https://rahulshettyacademy.com/api/ecom/uploads/productImage_1650649434146.jpeg\",\r\n        \"productRating\": \"0\",\r\n        \"productTotalOrders\": \"0\",\r\n        \"productStatus\": true,\r\n        \"productFor\": \"men\",\r\n        \"productAddedBy\": \"{{LoginCred_Username}}\",\r\n        \"__v\": 0\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURI}}{{AddToCart_Resource}}",
+					"host": [
+						"{{BaseURI}}{{AddToCart_Resource}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Create Order\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"Order Placed Successfully\");\r",
+							"})\r",
+							"\r",
+							"pm.environment.set(\"CreateOrder_RsB_OrderID\", APIResponseBody.orders[0]);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orders\": [\r\n        {\r\n            \"country\": \"India\",\r\n            \"productOrderedId\": \"{{AddProduct_RsB_ProductID}}\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURI}}{{CreateOrder_Resource}}",
+					"host": [
+						"{{BaseURI}}{{CreateOrder_Resource}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetOrders",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Get Orders Before Deleting Orders\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(APIResponseBody.message).to.eql(\"Orders fetched for customer Successfully\");\r",
+							"    pm.expect(APIResponseBody.data.length).to.be.greaterThan(0);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BaseURI}}{{GetOrders_Resource}}{{AccountLogin_RsB_UserID}}",
+					"host": [
+						"{{BaseURI}}{{GetOrders_Resource}}{{AccountLogin_RsB_UserID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Delete Order\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"Orders Deleted Successfully\");\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURI}}{{DeleteOrder_Resource}}{{CreateOrder_RsB_OrderID}}",
+					"host": [
+						"{{BaseURI}}{{DeleteOrder_Resource}}{{CreateOrder_RsB_OrderID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetOrders",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Get Orders After Deleting Orders\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"No Orders\");\r",
+							"    pm.expect(APIResponseBody.data.length).to.be.eql(0);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BaseURI}}{{GetOrders_Resource}}{{AccountLogin_RsB_UserID}}",
+					"host": [
+						"{{BaseURI}}{{GetOrders_Resource}}{{AccountLogin_RsB_UserID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteProduct",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const APIResponseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Verify Delete Product\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(APIResponseBody.message).to.eqls(\"Product Deleted Successfully\");\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{AccountLogin_RsB_Auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseURI}}{{DeleteProduct_Resource}}{{AddProduct_RsB_ProductID}}",
+					"host": [
+						"{{BaseURI}}{{DeleteProduct_Resource}}{{AddProduct_RsB_ProductID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

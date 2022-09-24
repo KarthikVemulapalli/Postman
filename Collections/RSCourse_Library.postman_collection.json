@@ -1,0 +1,515 @@
+{
+	"info": {
+		"_postman_id": "d6a6e499-7869-42c4-8589-8ef42dc28ce0",
+		"name": "RSCourse_Library",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15101547"
+	},
+	"item": [
+		{
+			"name": "LibraryFlow",
+			"item": [
+				{
+					"name": "AddBook",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Introduction to Assertions\r",
+									"//***In Scripting, Variables need to be accessed using code\r",
+									"\r",
+									"//Retrieve Response Body in JSON format\r",
+									"const ResBodyJsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"API - Response Code Validation\", function(){\r",
+									"    //Validate Status Code\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"//Validating a certain Test for this API\r",
+									"pm.test(\"API - Response Body Validation\", function(){\r",
+									"    //Test Function contains all the conditions API passed\r",
+									"    //Validate respective property present in Response Body\r",
+									"    pm.expect(ResBodyJsonData).to.have.property(\"Msg\");\r",
+									"    //Validate respective Property value of Response Body\r",
+									"    //Use JSON Path finder online to get path of property\r",
+									"    pm.expect(ResBodyJsonData.Msg).to.eql(\"successfully added\");\r",
+									"    //Validate Success Message anywhere in Entire Body\r",
+									"    pm.expect(pm.response.text()).to.include(\"successfully\");\r",
+									"} )\r",
+									"\r",
+									"//Save Book ID in Collection Variables\r",
+									"//var vs const - var variable value can be changed, const variable value cannot be changed.\r",
+									"var ID = ResBodyJsonData.ID;\r",
+									"pm.collectionVariables.set(\"BookID\", ID);\r",
+									"\r",
+									"pm.test(\"API - Response Headers Validation\", function(){\r",
+									"    //Validate Header is Present\r",
+									"    pm.response.headers.has(\"Content-Type\");\r",
+									"    //Validate Header Value\r",
+									"    //pm.response.headers -> Give List, we can use get & set methods\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json;charset=UTF-8\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"API - Response Time Validation\", function(){\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//***In Scripting, Variables need to be accessed using code***\r",
+									"//Create Random ISBN code to add book\r",
+									"\r",
+									"//Fetch data from Global Variables\r",
+									"const ISBNCompCode = pm.globals.get(\"RSCourseLibrary_CompanyCode\");\r",
+									"\r",
+									"//Generate Random number between 1 to 1000 - $randomint (bypostman) \r",
+									"const ISBNNum = pm.variables.replaceIn(('{{$randomInt}}'));\r",
+									"const ISBNValue = ISBNCompCode+ISBNNum;\r",
+									"\r",
+									"//Set Collection variable value\r",
+									"pm.collectionVariables.set(\"BookISBN\", ISBNValue);\r",
+									"\r",
+									"//Generaten Unix timestamp - $timestamp (bypostman)\r",
+									"const AisleValue = pm.variables.replaceIn(('{{$timestamp}}'));\r",
+									"pm.collectionVariables.set(\"BookAisle\", AisleValue);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{BookName}}\",\r\n    \"isbn\": \"{{BookISBN}}\",\r\n    \"aisle\": \"{{BookAisle}}\",\r\n    \"author\": \"{{BookAuthor}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURI}}/{{Resource}}/Addbook.php",
+							"host": [
+								"{{BaseURI}}"
+							],
+							"path": [
+								"{{Resource}}",
+								"Addbook.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RetrieveBook_UsingID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const ResponseBodyJSON = pm.response.json();\r",
+									"pm.test(\"Book Retrieve Using ID Validation\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    //Validate ISBN\r",
+									"    pm.expect(ResponseBodyJSON[0].isbn).to.eql(pm.collectionVariables.get(\"BookISBN\"));\r",
+									"    //Validate Aisle\r",
+									"    pm.expect(ResponseBodyJSON[0].aisle).to.equal(pm.collectionVariables.get(\"BookAisle\"));\r",
+									"});\r",
+									"\r",
+									"//JSON Schema Validation\r",
+									"const ResponseBodySchema = {\r",
+									"    \"definitions\": {\r",
+									"        \"Welcome2Element\": {\r",
+									"            \"type\": \"object\",\r",
+									"            \"additionalProperties\": false,\r",
+									"            \"properties\": {\r",
+									"                \"book_name\": {\r",
+									"                    \"type\": \"string\"\r",
+									"                },\r",
+									"                \"isbn\": {\r",
+									"                    \"type\": \"string\"\r",
+									"                },\r",
+									"                \"aisle\": {\r",
+									"                    \"type\": \"string\",\r",
+									"                    \"format\": \"integer\"\r",
+									"                },\r",
+									"                \"author\": {\r",
+									"                    \"type\": \"string\"\r",
+									"                }\r",
+									"            },\r",
+									"            \"required\": [\r",
+									"                \"aisle\",\r",
+									"                \"author\",\r",
+									"                \"book_name\",\r",
+									"                \"isbn\"\r",
+									"            ],\r",
+									"            \"title\": \"Welcome2Element\"\r",
+									"        }\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Response Body JSON Schema Validation\",function(){\r",
+									"    pm.response.to.have.jsonSchema(ResponseBodySchema);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseURI}}/{{Resource}}/GetBook.php?ID={{BookID}}",
+							"host": [
+								"{{BaseURI}}"
+							],
+							"path": [
+								"{{Resource}}",
+								"GetBook.php"
+							],
+							"query": [
+								{
+									"key": "ID",
+									"value": "{{BookID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RetrieveBook_UsingAuthor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const ResponseBodyJSON = pm.response.json();\r",
+									"pm.test(\"Book Retrieve Using Author Validation\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    //Validate ISBN\r",
+									"    pm.expect(ResponseBodyJSON[0].isbn).to.eql(pm.collectionVariables.get(\"BookISBN\"));\r",
+									"    //Validate Aisle\r",
+									"    pm.expect(ResponseBodyJSON[0].aisle).to.equal(pm.collectionVariables.get(\"BookAisle\"));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseURI}}/{{Resource}}/GetBook.php?AuthorName={{BookAuthor}}",
+							"host": [
+								"{{BaseURI}}"
+							],
+							"path": [
+								"{{Resource}}",
+								"GetBook.php"
+							],
+							"query": [
+								{
+									"key": "AuthorName",
+									"value": "{{BookAuthor}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteBook",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Delete Book Validation\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    //Validate message from body\r",
+									"    pm.expect(pm.response.text()).include(\"successfully deleted\");\r",
+									"});\r",
+									"\r",
+									"//Only using below we can get the request body in JSON format\r",
+									"console.log(JSON.parse(pm.request.body.raw));\r",
+									"\r",
+									"//Using below we can access the below Request Headers\r",
+									"console.log(pm.request.headers.get('Content-Type'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ID\": \"{{BookID}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURI}}/{{Resource}}/DeleteBook.php",
+							"host": [
+								"{{BaseURI}}"
+							],
+							"path": [
+								"{{Resource}}",
+								"DeleteBook.php"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AddBook_ExistingData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const ResBodyJsonData = pm.response.json();\r",
+							"\r",
+							"const ReqBodyJsonData = JSON.parse(pm.request.body.raw);\r",
+							"var reqisbdval = ReqBodyJsonData.isbn;\r",
+							"var reqaisleval = ReqBodyJsonData.aisle;\r",
+							"var FinalBookID = reqisbdval+reqaisleval;\r",
+							"pm.collectionVariables.set(\"BookID\", FinalBookID);\r",
+							"\r",
+							"function cleanUpExistingBookData(){\r",
+							"    postman.setNextRequest(\"DeleteBook\");\r",
+							"}\r",
+							"\r",
+							"pm.test(\"API - Response Code Validation\", function(){\r",
+							"    //Validate Status Code\r",
+							"    try { pm.response.to.have.status(200); }\r",
+							"    catch(err){\r",
+							"       \r",
+							"        if (ResBodyJsonData.msg.includes(\"already exists\")){\r",
+							"            cleanUpExistingBookData();\r",
+							"        }\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\":\"Java Recursion\",\r\n\"isbn\":\"RSCourseLibrary1111\",\r\n\"aisle\":\"123454321\",\r\n\"author\":\"Madam Tuxen\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURI}}/{{Resource}}/Addbook.php",
+					"host": [
+						"{{BaseURI}}"
+					],
+					"path": [
+						"{{Resource}}",
+						"Addbook.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddBook_DataDriven",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Introduction to Assertions\r",
+							"//***In Scripting, Variables need to be accessed using code\r",
+							"\r",
+							"//Retrieve Response Body in JSON format\r",
+							"const ResBodyJsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"API - Response Code Validation\", function(){\r",
+							"    //Validate Status Code\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//Validating a certain Test for this API\r",
+							"pm.test(\"API - Response Body Validation\", function(){\r",
+							"    //Test Function contains all the conditions API passed\r",
+							"    //Validate respective property present in Response Body\r",
+							"    pm.expect(ResBodyJsonData).to.have.property(\"Msg\");\r",
+							"    //Validate respective Property value of Response Body\r",
+							"    //Use JSON Path finder online to get path of property\r",
+							"    pm.expect(ResBodyJsonData.Msg).to.eql(\"successfully added\");\r",
+							"    //Validate Success Message anywhere in Entire Body\r",
+							"    pm.expect(pm.response.text()).to.include(\"successfully\");\r",
+							"} )\r",
+							"\r",
+							"//Save Book ID in Collection Variables\r",
+							"//var vs const - var variable value can be changed, const variable value cannot be changed.\r",
+							"var ID = ResBodyJsonData.ID;\r",
+							"pm.collectionVariables.set(\"BookID\", ID);\r",
+							"\r",
+							"pm.test(\"API - Response Headers Validation\", function(){\r",
+							"    //Validate Header is Present\r",
+							"    pm.response.headers.has(\"Content-Type\");\r",
+							"    //Validate Header Value\r",
+							"    //pm.response.headers -> Give List, we can use get & set methods\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json;charset=UTF-8\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"API - Response Time Validation\", function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//***In Scripting, Variables need to be accessed using code***\r",
+							"//Create Random ISBN code to add book\r",
+							"\r",
+							"//Fetch data from Global Variables\r",
+							"const ISBNCompCode = pm.globals.get(\"RSCourseLibrary_CompanyCode\");\r",
+							"\r",
+							"//Generate Random number between 1 to 1000 - $randomint (bypostman) \r",
+							"const ISBNNum = pm.variables.replaceIn(('{{$randomInt}}'));\r",
+							"const ISBNValue = ISBNCompCode+ISBNNum;\r",
+							"\r",
+							"//Set Collection variable value\r",
+							"pm.collectionVariables.set(\"BookISBN\", ISBNValue);\r",
+							"\r",
+							"//Generaten Unix timestamp - $timestamp (bypostman)\r",
+							"const AisleValue = pm.variables.replaceIn(('{{$timestamp}}'));\r",
+							"pm.collectionVariables.set(\"BookAisle\", AisleValue);\r",
+							"\r",
+							"\r",
+							"//Get Multiple TestData from CSV file\r",
+							"pm.collectionVariables.set(\"BookName\", pm.iterationData.get('Book Name'));\r",
+							"pm.collectionVariables.set(\"BookAuthor\", pm.iterationData.get('Book Author'));\r",
+							"\r",
+							"console.log(pm.collectionVariables.get(\"BookName\"));\r",
+							"console.log(pm.collectionVariables.get(\"BookAuthor\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{BookName}}\",\r\n    \"isbn\": \"{{BookISBN}}\",\r\n    \"aisle\": \"{{BookAisle}}\",\r\n    \"author\": \"{{BookAuthor}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURI}}/{{Resource}}/Addbook.php",
+					"host": [
+						"{{BaseURI}}"
+					],
+					"path": [
+						"{{Resource}}",
+						"Addbook.php"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BookISBN",
+			"value": "Unique",
+			"type": "string"
+		},
+		{
+			"key": "BookAisle",
+			"value": "Unique",
+			"type": "string"
+		},
+		{
+			"key": "BookID",
+			"value": "Unique",
+			"type": "string"
+		},
+		{
+			"key": "BookName",
+			"value": "Learn Appium Automation with Java",
+			"type": "string"
+		},
+		{
+			"key": "BookAuthor",
+			"value": "John ABCD Java",
+			"type": "string"
+		}
+	]
+}

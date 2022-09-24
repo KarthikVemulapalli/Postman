@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "fd3c4394-8112-4f34-ab0d-6ed4bcd20973",
+		"name": "RSSample_OAuth2.0",
+		"description": "OAuth 2.0\n\n\\* It is an industry-standard protocol for Authorization. This comes with multiple Grant types.  \n\\* Most commonly used grant types are 'Authorization Code' and 'Client Credentials'. Example: Logging In to BookMyShow application using 'SignIn with Google' or 'SignIn with Facebook' options. To achieve this OAuth2.0 is implemented in backend.\n\nCollection Execution Flow:\n\n1.  Get Code - Launch the RequestURL in the browser. Enter Gmail credentials and login. We will get a blank page (expected), in URL of page we can observe 'code'. Use this code and paste in query parameter of 'GetAccessToken' API.\n2.  GetAccessToken - After pasting the code from 'GetCode' API and hit request. We get 'AccessToken'. Use this AccessToken in 'ActualRequest' API to get response i.e. courses details.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15101547"
+	},
+	"item": [
+		{
+			"name": "GetCode",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&auth_url=https://accounts.google.com/o/oauth2/v2/auth&client_id=692183103107-p0m7ent2hk7suguv4vq22hjcfhcr43pj.apps.googleusercontent.com&response_type=code&redirect_uri=https://rahulshettyacademy.com/getCourse.php",
+					"protocol": "https",
+					"host": [
+						"accounts",
+						"google",
+						"com"
+					],
+					"path": [
+						"o",
+						"oauth2",
+						"v2",
+						"auth"
+					],
+					"query": [
+						{
+							"key": "scope",
+							"value": "https://www.googleapis.com/auth/userinfo.email",
+							"description": "What account details are required from Google, this URL will be designed on our requirements. Google will share only details mentioned in contract."
+						},
+						{
+							"key": "auth_url",
+							"value": "https://accounts.google.com/o/oauth2/v2/auth",
+							"description": "Server Side AuthURL, in this case google provides this."
+						},
+						{
+							"key": "client_id",
+							"value": "692183103107-p0m7ent2hk7suguv4vq22hjcfhcr43pj.apps.googleusercontent.com",
+							"description": "This is Rahulshetty website ID. Google matches with their records, to make sure valid person requesting the data."
+						},
+						{
+							"key": "response_type",
+							"value": "code",
+							"description": "What is expected, in this case Code"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://rahulshettyacademy.com/getCourse.php",
+							"description": "After providing details and code, where the page should be navigated. This states that after authentication user should be navigated to URL."
+						},
+						{
+							"key": "state",
+							"value": "RandomValue",
+							"description": "Random value is passed during request, when we get the response the same variable and value is returned with response. This is done for validation, non mandatory field.",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAccessToken",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://www.googleapis.com/oauth2/v4/token?code=4%2F0ARtbsJqSijccHD7Rl0eHe06Zis1wQoRSc7T6ENvAngoAZkCjC-OflAEelB4mOTZkEwsIVQ&client_id=692183103107-p0m7ent2hk7suguv4vq22hjcfhcr43pj.apps.googleusercontent.com&client_secret=erZOWM9g3UtwNRj340YYaK_W&redirect_uri=https://rahulshettyacademy.com/getCourse.php&grant_type=authorization_code#",
+					"protocol": "https",
+					"host": [
+						"www",
+						"googleapis",
+						"com"
+					],
+					"path": [
+						"oauth2",
+						"v4",
+						"token"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "4%2F0ARtbsJqSijccHD7Rl0eHe06Zis1wQoRSc7T6ENvAngoAZkCjC-OflAEelB4mOTZkEwsIVQ"
+						},
+						{
+							"key": "client_id",
+							"value": "692183103107-p0m7ent2hk7suguv4vq22hjcfhcr43pj.apps.googleusercontent.com"
+						},
+						{
+							"key": "client_secret",
+							"value": "erZOWM9g3UtwNRj340YYaK_W"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://rahulshettyacademy.com/getCourse.php"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code"
+						},
+						{
+							"key": "response_type",
+							"value": "code",
+							"disabled": true
+						},
+						{
+							"key": "state",
+							"value": "RandomValueForAccessTokenValidation",
+							"disabled": true
+						},
+						{
+							"key": "prompt",
+							"value": "consent",
+							"disabled": true
+						},
+						{
+							"key": "authuser",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "scope",
+							"value": "https://www.googleapis.com/auth/userinfo.email",
+							"disabled": true
+						}
+					],
+					"hash": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AcutalRequest",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://rahulshettyacademy.com/getCourse.php?access_token=ya29.a0Aa4xrXMsO26LTMb6FhqpIfW4sK72xbweyBmY4GwSIIdnWoujCX44OVcz9qbFBGk3-1IQHRJ0f1elYFE9PTo_esq2MdDmMs0i0pnYBGm1uYc-dmn_VVQTvnFHdPiEAaQq9_mDdvxmS1-9AzPIFC-6j1NY7n6VaCgYKATASARESFQEjDvL9tLQkiTqEWI3B0mNh58aoLg0163",
+					"protocol": "https",
+					"host": [
+						"rahulshettyacademy",
+						"com"
+					],
+					"path": [
+						"getCourse.php"
+					],
+					"query": [
+						{
+							"key": "access_token",
+							"value": "ya29.a0Aa4xrXMsO26LTMb6FhqpIfW4sK72xbweyBmY4GwSIIdnWoujCX44OVcz9qbFBGk3-1IQHRJ0f1elYFE9PTo_esq2MdDmMs0i0pnYBGm1uYc-dmn_VVQTvnFHdPiEAaQq9_mDdvxmS1-9AzPIFC-6j1NY7n6VaCgYKATASARESFQEjDvL9tLQkiTqEWI3B0mNh58aoLg0163"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ClientID",
+			"value": "692183103107-p0m7ent2hk7suguv4vq22hjcfhcr43pj.apps.googleusercontent.com",
+			"type": "string"
+		},
+		{
+			"key": "ClientSecret",
+			"value": "erZOWM9g3UtwNRj340YYaK_W",
+			"type": "string"
+		},
+		{
+			"key": "Scope",
+			"value": "https://www.googleapis.com/auth/userinfo.email",
+			"type": "string"
+		},
+		{
+			"key": "State",
+			"value": "RandomValueForValidation",
+			"type": "string"
+		}
+	]
+}
